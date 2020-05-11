@@ -13,12 +13,18 @@ var VistaAdministrador = function (modelo, controlador, elementos) {
   });
 
   this.modelo.preguntaEliminada.suscribir(function () {
-    contexto.reconstruirLista ();
+    contexto.reconstruirLista();
+  });
+
+  this.modelo.preguntaEditada.suscribir(function () {
+    contexto.reconstruirLista();
+  });
+
+  this.modelo.todasBorradas.suscribir(function () {
+    contexto.reconstruirLista();
   });
 
 };
-
-
 VistaAdministrador.prototype = {
   //lista
   inicializar: function () {
@@ -30,13 +36,11 @@ VistaAdministrador.prototype = {
   construirElementoPregunta: function (pregunta) {
     var contexto = this;
     var nuevoItem;
-     nuevoItem = $('<li>', {
-      'class' : 'list-group-item',
-      'id' : pregunta.id,
-      'text' : pregunta.textoPregunta
+    nuevoItem = $('<li>', {
+      'class': 'list-group-item',
+      'id': pregunta.id,
+      'text': pregunta.textoPregunta
     });
-    //completar
-    //asignar a nuevoitem un elemento li con clase "list-group-item", id "pregunta.id" y texto "pregunta.textoPregunta"
     var interiorItem = $('.d-flex');
     var titulo = interiorItem.find('h5');
     titulo.text(pregunta.textoPregunta);
@@ -54,23 +58,23 @@ VistaAdministrador.prototype = {
       lista.append(this.construirElementoPregunta(preguntas[i]));
     }
   },
+
   configuracionDeBotones: function () {
     var e = this.elementos;
     var contexto = this;
-    
+
     //boton agregar pregunta
     e.botonAgregarPregunta.click(function () {
       var value = e.pregunta.val();
       var respuestas = [];
       $('[name="option[]"]').each(function () {
-        //completar
-          var respuesta = $(this).val();
-          var cantVotos = 0;
-          var nuevaRespuesta = {
-            'textoRespuesta': respuesta,
-            'cantidad': cantVotos
-          };
-          respuestas.push(nuevaRespuesta);
+        var respuesta = $(this).val();
+        var cantVotos = 0;
+        var nuevaRespuesta = {
+          'textoRespuesta': respuesta,
+          'cantidad': cantVotos
+        };
+        respuestas.push(nuevaRespuesta);
       })
       contexto.limpiarFormulario();
       contexto.controlador.agregarPregunta(value, respuestas);
@@ -81,7 +85,24 @@ VistaAdministrador.prototype = {
       var id = parseInt($('.list-group-item.active').attr('id'));
       contexto.controlador.borrarPregunta(id);
     });
-  },
+
+    //boton editar pregunta
+    e.botonEditarPregunta.click(function () {
+      var id = parseInt($('.list-group-item.active').attr('id'));
+      if (id) {
+        var editada = prompt("Nueva Pregunta: ");
+        contexto.controlador.editarPregunta(id, editada);
+
+      } else {
+        alert("Seleccionar una pregunta");
+      }
+    });
+
+    //boton borrar todas las preguntas
+    e.borrarTodo.click(function () {
+      contexto.controlador.borrarTodo();
+    });    
+    },
   limpiarFormulario: function () {
     $('.form-group.answer.has-feedback.has-success').remove();
   },
